@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import type { Lang } from './i18n';
 
 export interface Article {
   slug: string;
@@ -8,6 +9,7 @@ export interface Article {
   summary: string;
   bodyHtml: string;
   coverImage?: string;
+  lang: Lang;
 }
 
 function parseFrontmatter(raw: string): { meta: Record<string, string>; body: string } {
@@ -53,24 +55,36 @@ function mdToHtml(md: string): string {
 
 const DIR = path.join(process.cwd(), 'content', 'news');
 
-export function getAllArticles(): Article[] {
-  if (!fs.existsSync(DIR)) return [];
-  return fs.readdirSync(DIR)
-    .filter(f => f.endsWith('.md'))
-    .map(f => {
-      const { meta, body } = parseFrontmatter(fs.readFileSync(path.join(DIR, f), 'utf-8'));
+function loadArticle(slug: string, lang: Lang): Article | null {
+  // 优先读当前语言版本，没有则回退到繁体中文
+  const candidates = [lang, 'zh'];
+  for (const l of candidates) {
+    const fp = path.join(DIR, slug, `${l}.md`);
+    if (fs.existsSync(fp)) {
+      const { meta, body } = parseFrontmatter(fs.readFileSync(fp, 'utf-8'));
       return {
-        slug: meta.slug || f.replace('.md', ''),
+        slug,
         title: meta.title || '',
         date: meta.date || '',
         summary: meta.summary || '',
         bodyHtml: mdToHtml(body),
         coverImage: meta.coverImage || undefined,
+        lang: l as Lang,
       };
-    })
+    }
+  }
+  return null;
+}
+
+export function getAllArticles(lang: Lang): Article[] {
+  if (!fs.existsSync(DIR)) return [];
+  return fs.readdirSync(DIR, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => loadArticle(d.name, lang))
+    .filter((a): a is Article => a !== null)
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export function getArticle(slug: string): Article | undefined {
-  return getAllArticles().find(a => a.slug === slug);
+export function getArticle(lang: Lang, slug: string): Article | undefined {
+  return loadArticle(slug, lang) ?? undefined;
 }

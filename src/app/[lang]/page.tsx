@@ -1,6 +1,7 @@
 import { getAllArticles } from '@/lib/news';
 import { langs, t, isValidLang } from '@/lib/i18n';
 import { notFound } from 'next/navigation';
+import type { Lang } from '@/lib/i18n';
 
 export async function generateStaticParams() {
   return langs.map(lang => ({ lang }));
@@ -10,7 +11,7 @@ export default async function LangHomePage({ params }: { params: Promise<{ lang:
   const { lang } = await params;
   if (!isValidLang(lang)) notFound();
 
-  const articles = getAllArticles();
+  const articles = getAllArticles(lang);
 
   return (
     <>
@@ -54,6 +55,11 @@ export default async function LangHomePage({ params }: { params: Promise<{ lang:
                   <article className="border-b border-black/5 pb-8 hover:border-red-flag/30 transition-colors">
                     <div className="flex items-center gap-3 text-xs text-muted mb-2">
                       <time>{a.date}</time>
+                      {a.lang !== lang && (
+                        <span className="text-white/60 bg-brand-navy rounded px-1.5 py-0.5 text-[10px]">
+                          {a.lang === 'zh' ? '繁中' : a.lang === 'zh-CN' ? '简中' : a.lang}
+                        </span>
+                      )}
                     </div>
                     <h2 className="text-xl font-bold text-brand-dark group-hover:text-red-flag transition-colors mb-2 leading-snug">
                       {a.title}
