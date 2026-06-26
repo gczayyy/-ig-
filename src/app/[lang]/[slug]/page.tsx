@@ -1,14 +1,15 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getAllArticles, getArticle } from '@/lib/news';
-import { langs, t, isValidLang, type Lang } from '@/lib/i18n';
+import { langs, t, isValidLang } from '@/lib/i18n';
 
 type Props = { params: Promise<{ lang: string; slug: string }> };
 
 export function generateStaticParams() {
   const params: { lang: string; slug: string }[] = [];
+  const articles = getAllArticles();
   for (const lang of langs) {
-    for (const a of getAllArticles(lang)) {
+    for (const a of articles) {
       params.push({ lang, slug: a.slug });
     }
   }
@@ -18,7 +19,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang, slug } = await params;
   if (!isValidLang(lang)) return { title: 'Not Found' };
-  const a = getArticle(lang, slug);
+  const a = getArticle(slug);
   if (!a) return { title: 'Not Found' };
   return { title: `${a.title} - 茜帆`, description: a.summary };
 }
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ArticlePage({ params }: Props) {
   const { lang, slug } = await params;
   if (!isValidLang(lang)) notFound();
-  const a = getArticle(lang, slug);
+  const a = getArticle(slug);
   if (!a) notFound();
 
   return (

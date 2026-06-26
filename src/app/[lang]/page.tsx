@@ -1,5 +1,5 @@
 import { getAllArticles } from '@/lib/news';
-import { langs, t, isValidLang, type Lang } from '@/lib/i18n';
+import { langs, t, isValidLang } from '@/lib/i18n';
 import { notFound } from 'next/navigation';
 
 export async function generateStaticParams() {
@@ -10,7 +10,7 @@ export default async function LangHomePage({ params }: { params: Promise<{ lang:
   const { lang } = await params;
   if (!isValidLang(lang)) notFound();
 
-  const articles = getAllArticles(lang);
+  const articles = getAllArticles();
 
   return (
     <>
