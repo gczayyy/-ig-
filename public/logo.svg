@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Circular background -->
+  <circle cx="60" cy="60" r="58" fill="#0D1B2A" stroke="#C62828" stroke-width="2"/>
+  <circle cx="60" cy="60" r="54" fill="none" stroke="#C62828" stroke-width="0.5" opacity="0.5"/>
+
+  <!-- Top text: SINFAAN (curved) -->
+  <text font-family="Arial, sans-serif" font-weight="900" font-size="10" fill="#C62828" letter-spacing="4">
+    <textPath href="#topPath" startOffset="50%" text-anchor="middle">SINFAAN</textPath>
+  </text>
+
+  <!-- Green sprout/leaf in center -->
+  <g transform="translate(60,58)">
+    <!-- Stem -->
+    <line x1="0" y1="15" x2="0" y2="-8" stroke="#2E7D32" stroke-width="3" stroke-linecap="round"/>
+    <!-- Left leaf -->
+    <path d="M0,-8 Q-18,-20 -14,-35 Q-6,-25 0,-12" fill="#4CAF50" opacity="0.9"/>
+    <!-- Right leaf -->
+    <path d="M0,-12 Q18,-22 16,-37 Q6,-27 0,-14" fill="#66BB6A" opacity="0.9"/>
+    <!-- Small bud -->
+    <circle cx="0" cy="-8" r="3" fill="#81C784"/>
+  </g>
+
+  <!-- Bottom waves -->
+  <path d="M10,102 Q25,86 40,102 Q55,118 70,102 Q85,86 100,102 L100,112 L10,112 Z" fill="#2E5090" opacity="0.6"/>
+
+  <!-- Chinese characters -->
+  <text x="60" y="78" font-family="Noto Sans TC, sans-serif" font-weight="900" font-size="13" fill="#C62828" text-anchor="middle" letter-spacing="6">茜帆</text>
+
+  <defs>
+    <path id="topPath" d="M25,38 Q60,12 95,38"/>
+  </defs>
+</svg>
