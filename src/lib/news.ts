@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import type { Lang } from './i18n';
 
 export interface Article {
   slug: string;
@@ -8,6 +9,7 @@ export interface Article {
   summary: string;
   bodyHtml: string;
   coverImage?: string;
+  lang: Lang;
 }
 
 function parseFrontmatter(raw: string): { meta: Record<string, string>; body: string } {
@@ -51,14 +53,17 @@ function mdToHtml(md: string): string {
   }).join('\n');
 }
 
-const DIR = path.join(process.cwd(), 'content', 'news');
+function dirForLang(lang: Lang): string {
+  return path.join(process.cwd(), 'content', 'news', lang);
+}
 
-export function getAllArticles(): Article[] {
-  if (!fs.existsSync(DIR)) return [];
-  return fs.readdirSync(DIR)
+export function getAllArticles(lang: Lang): Article[] {
+  const dir = dirForLang(lang);
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir)
     .filter(f => f.endsWith('.md'))
     .map(f => {
-      const { meta, body } = parseFrontmatter(fs.readFileSync(path.join(DIR, f), 'utf-8'));
+      const { meta, body } = parseFrontmatter(fs.readFileSync(path.join(dir, f), 'utf-8'));
       return {
         slug: meta.slug || f.replace('.md', ''),
         title: meta.title || '',
@@ -66,11 +71,12 @@ export function getAllArticles(): Article[] {
         summary: meta.summary || '',
         bodyHtml: mdToHtml(body),
         coverImage: meta.coverImage || undefined,
+        lang,
       };
     })
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export function getArticle(slug: string): Article | undefined {
-  return getAllArticles().find(a => a.slug === slug);
+export function getArticle(lang: Lang, slug: string): Article | undefined {
+  return getAllArticles(lang).find(a => a.slug === slug);
 }
